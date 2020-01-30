@@ -1,0 +1,84 @@
+oppCode | flag | assmb | descrip
+0000 x ldm 		A = ram[B]
+0001 x lda [addr]	A = ram[addr]
+0010 x sta [addr]	ram[addr] = A
+0011 x ldb [addr]	B = ram[addr]
+0100 x stb [addr]	ram[addr] = B
+0101 x sea [val] 	A = value
+0110 x seb [val] 	B = value
+0111 x add		A = A + B
+1000 x sub		A = A - B
+1001 x cmp		Flag = A == B
+1010 x jmp [val]	PC = value
+1011 1 jpf [val]	if flag == 1 then PC = value
+1100 0 njf [val]	if flag == 0 then PC = value
+1101 x dsp		Disp Reg = A
+1110 x hlt		Halts program
+1111 x stm		ram[B] = A
+Control words:
+pcOut, pcIn, pcInc, ramAddrIn, ramIn, ramOut, aIn, aOut, bIn, bOut, instructDataOut, aluAdd, aluSub, aluOut, setFlag, clkOff, dispIn
+fin    fin   fin    fin        fin    fin     fin  fin   fin  fin   fin              fin     fin     fin	    fin      fin     fin
+All steps:
+  00) pcOut
+  01) pcInc
+
+ld[a,b]:
+  10) ramAddrIn, instructDataOut
+  11) ramOut, [a,b]In
+
+st[a,b]:
+  10) ramAddrIn, instructDataOut
+  11) ramIn, [a,b]Out
+
+se[a,b]
+  10) instructDataOut, [a,b]In
+
+add
+  10) aluAdd
+  11) aluOut, aIn
+
+sub
+  10) aluSub
+  11) aluOut, aIn
+
+cmp
+  10) setFlag
+
+[jmp, jpf, njf]
+  10) instructDataOut, pcIn
+
+dsp
+  10) aOut, dispIn
+
+hlt
+  10) clkOff
+
+stm
+  10) ramAddrIn, bOut
+  11) ramIn, aOut
+
+Test programs:
+sea 0d2
+seb 0d2
+dsp
+add
+sta 0d0
+ldb 0d0
+jmp 0d2
+
+Fib Seq:
+sea 0d233
+sta 0d2
+sea 0d1
+seb 0d1
+add
+dsp
+sta 0d0
+lda 0d2
+cmp
+jpf 0d14
+stb 0d1
+lda 0d1
+ldb 0d0
+jmp 0d4
+hlt
